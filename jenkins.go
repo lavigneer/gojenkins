@@ -118,6 +118,13 @@ func (j *Jenkins) CreateNode(ctx context.Context, name string, numExecutors int,
 	}
 
 	method := params["method"]
+
+	if _, ok := params["mode"]; !ok {
+		params["mode"] = "NORMAL"
+	}
+
+	mode := params["mode"]
+
 	var launcher map[string]string
 	switch method {
 	case "":
@@ -146,7 +153,6 @@ func (j *Jenkins) CreateNode(ctx context.Context, name string, numExecutors int,
 
 	node := &Node{Jenkins: j, Raw: new(NodeResponse), Base: "/computer/" + name}
 	NODE_TYPE := "hudson.slaves.DumbSlave$DescriptorImpl"
-	MODE := "NORMAL"
 	qr := map[string]string{
 		"name": name,
 		"type": NODE_TYPE,
@@ -155,7 +161,7 @@ func (j *Jenkins) CreateNode(ctx context.Context, name string, numExecutors int,
 			"nodeDescription":    description,
 			"remoteFS":           remoteFS,
 			"numExecutors":       numExecutors,
-			"mode":               MODE,
+			"mode":               mode,
 			"type":               NODE_TYPE,
 			"labelString":        label,
 			"retentionsStrategy": map[string]string{"stapler-class": "hudson.slaves.RetentionStrategy$Always"},
